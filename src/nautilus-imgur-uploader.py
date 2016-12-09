@@ -60,7 +60,6 @@ CLIENT_ID = '674fadc274d0beb'
 CLIENT_SECTRET = '4fd4cdcd942ca2427dbbf8f7ce6ab6ea71abb78e'
 EXTENSIONS_FROM = ['.bmp', '.eps', '.gif', '.jpg', '.pcx', '.png', '.ppm',
                    '.tif', '.tiff', '.webp']
-SEPARATOR = u'\u2015' * 10
 PARAMS = {
         'access_token': '',
         'refresh_token': ''}
@@ -351,7 +350,6 @@ def get_duration(file_in):
 def get_files(files_in):
     files = []
     for file_in in files_in:
-        print(file_in)
         file_in = unquote_plus(file_in.get_uri()[7:])
         if os.path.isfile(file_in):
             files.append(file_in)
@@ -381,14 +379,14 @@ class ImgurUploaderMenuProvider(GObject.GObject, FileManager.MenuProvider):
         files = get_files(selected)
         if len(files) > 0:
             if len(files) == 1:
-                imd = ImgurDialog(None)
+                imd = ImgurDialog(window)
                 if imd.run() == Gtk.ResponseType.ACCEPT:
-                    imd.destroy()
                     config = {
                             'album': None,
                             'name': imd.get_name(),
                             'title': imd.get_title(),
                             'description': imd.get_description()}
+                    imd.destroy()
                 else:
                     imd.destroy()
                     return
@@ -426,8 +424,8 @@ class ImgurUploaderMenuProvider(GObject.GObject, FileManager.MenuProvider):
             ans = json.loads(response.text)
             self.access_token = ans['access_token']
             self.refresh_token = ans['refresh_token']
-            token.set('access_token', access_token)
-            token.set('refresh_token', refresh_token)
+            token.set('access_token', self.access_token)
+            token.set('refresh_token', self.refresh_token)
             token.save()
             self.is_login = True
 
@@ -444,47 +442,43 @@ class ImgurUploaderMenuProvider(GObject.GObject, FileManager.MenuProvider):
             tip=_('Send images to Imgur'))
         submenu = FileManager.Menu()
         top_menuitem.set_submenu(submenu)
-        if self.all_files_are_images(sel_items):
-            sub_menuitem_00 = FileManager.MenuItem(
-                name='ImgurUploaderMenuProvider::Gtk-imgur-sub-00',
-                label=_('Send...'),
-                tip='Send images to Imgur')
-            sub_menuitem_00.connect('activate', self.send_images, sel_items,
-                                    window)
-            submenu.append_item(sub_menuitem_00)
-        if self.is_login:
+
+        sub_menuitem_00 = FileManager.MenuItem(
+            name='ImgurUploaderMenuProvider::Gtk-imgur-sub-00',
+            label=_('Send...'),
+            tip='Send images to Imgur')
+        sub_menuitem_00.connect('activate', self.send_images, sel_items,
+                                window)
+        submenu.append_item(sub_menuitem_00)
+        if self.all_files_are_images(sel_items) and self.is_login:
             sub_menuitem_00.set_property('sensitive', True)
+        else:
+            sub_menuitem_00.set_property('sensitive', False)
+        if self.is_login:
             sub_menuitem_01 = FileManager.MenuItem(
                 name='ImgurUploaderMenuProvider::Gtk-imgur-sub-01',
                 label=_('Unlogin from Imgur'),
                 tip='Unlogin from Imgur')
             sub_menuitem_01.connect('activate', self.unlogin_from_imgur)
-            submenu.append_item(sub_menuitem_01)
         else:
-            sub_menuitem_00.set_property('sensitive', False)
             sub_menuitem_01 = FileManager.MenuItem(
                 name='ImgurUploaderMenuProvider::Gtk-imgur-sub-01',
                 label=_('Login to Imgur'),
                 tip='Login to Imgur to send images')
             sub_menuitem_01.connect('activate', self.login_to_imgur, window)
-            submenu.append_item(sub_menuitem_01)
+        submenu.append_item(sub_menuitem_01)
 
         sub_menuitem_02 = FileManager.MenuItem(
             name='ImgurUploaderMenuProvider::Gtk-imgur-sub-02',
-            label=SEPARATOR)
-        submenu.append_item(sub_menuitem_02)
-
-        sub_menuitem_03 = FileManager.MenuItem(
-            name='ImgurUploaderMenuProvider::Gtk-imgur-sub-03',
             label=_('About'),
             tip=_('About'))
-        sub_menuitem_03.connect('activate', self.about)
-        submenu.append_item(sub_menuitem_03)
+        sub_menuitem_02.connect('activate', self.about, window)
+        submenu.append_item(sub_menuitem_02)
 
         return top_menuitem,
 
-    def about(self, widget):
-        ad = Gtk.AboutDialog()
+    def about(self, widget, window):
+        ad = Gtk.AboutDialog(parent=window)
         ad.set_name(APPNAME)
         ad.set_version(VERSION)
         ad.set_copyright('Copyrignt (c) 2016\nLorenzo Carbonell')

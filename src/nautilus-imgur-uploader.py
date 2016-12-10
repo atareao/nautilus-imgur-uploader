@@ -172,7 +172,8 @@ class IdleObject(GObject.GObject):
 class DoItInBackground(IdleObject, Thread):
     __gsignals__ = {
         'started': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (int,)),
-        'ended': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (bool, object)),
+        'ended': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (
+            bool, object,)),
         'start_one': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (str,)),
         'end_one': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (float)),
     }
@@ -465,7 +466,7 @@ class ImgurUploaderMenuProvider(GObject.GObject, FileManager.MenuProvider):
             diib.connect('end_one', progreso.increase)
             diib.connect('ended', progreso.close)
             if len(files) == 1:
-                diib.connect('ended', show_ans, window)
+                diib.connect('ended', self.show_ans, window)
             progreso.connect('i-want-stop', diib.stop)
             diib.start()
             progreso.run()
@@ -473,6 +474,7 @@ class ImgurUploaderMenuProvider(GObject.GObject, FileManager.MenuProvider):
     def show_ans(self, anobject, result, ans, window):
         iad = ImgurAnswerDialog(window, ans)
         iad.run()
+        iad.destroy()
 
     def login_to_imgur(self, menu, window):
         client = ImgurClient(CLIENT_ID, CLIENT_SECTRET)

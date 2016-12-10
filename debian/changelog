@@ -1,3 +1,9 @@
+nautilus-imgur-uploader (0.2.0-0extras16.04.0) xenial; urgency=medium
+
+  * Added Answer dialog to show links
+
+ -- Lorenzo Carbonell <lorenzo.carbonell.cerezo@gmail.com>  Sat, 10 Dec 2016 08:49:43 +0100
+
 nautilus-imgur-uploader (0.1.0-0extras16.04.7) xenial; urgency=medium
 
   * First release

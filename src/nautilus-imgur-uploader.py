@@ -49,13 +49,12 @@ import json
 import codecs
 import requests
 
-APP = 'nautilus-imgur-uploader'
 APPNAME = 'nautilus-imgur-uploader'
 ICON = 'nautilus-imgur-uploader'
-VERSION = '0.1.0'
+VERSION = '$VERSION$'
 
 CONFIG_DIR = os.path.join(os.path.expanduser('~'), '.config')
-CONFIG_APP_DIR = os.path.join(CONFIG_DIR, APP)
+CONFIG_APP_DIR = os.path.join(CONFIG_DIR, APPNAME)
 TOKEN_FILE = os.path.join(CONFIG_APP_DIR, 'token')
 
 CLIENT_ID = '674fadc274d0beb'
@@ -104,7 +103,7 @@ class Token(object):
         f.close()
 
     def clear(self):
-        self.paramas = PARAMS
+        self.params = PARAMS
         self.save()
 
 
@@ -116,8 +115,8 @@ class LoginDialog(Gtk.Dialog):
                             Gtk.DialogFlags.MODAL |
                             Gtk.DialogFlags.DESTROY_WITH_PARENT)
         self.set_position(Gtk.WindowPosition.CENTER_ALWAYS)
-        self.set_title(APP)
-        # self.set_icon_from_file(comun.ICON)
+        self.set_title(APPNAME)
+        self.set_icon_name(ICON)
         #
         vbox = Gtk.VBox(spacing=5)
         self.get_content_area().add(vbox)
@@ -175,7 +174,7 @@ class DoItInBackground(IdleObject, Thread):
         'ended': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (
             bool, object,)),
         'start_one': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (str,)),
-        'end_one': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (float)),
+        'end_one': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (float,)),
     }
 
     def __init__(self, elements, client, config=None):
@@ -493,6 +492,7 @@ class ImgurUploaderMenuProvider(GObject.GObject, FileManager.MenuProvider):
             ans = json.loads(response.text)
             self.access_token = ans['access_token']
             self.refresh_token = ans['refresh_token']
+            token = Token()
             token.set('access_token', self.access_token)
             token.set('refresh_token', self.refresh_token)
             token.save()

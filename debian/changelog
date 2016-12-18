@@ -1,9 +1,16 @@
-nautilus-imgur-uploader (0.2.0-0extras16.04.1) xenial; urgency=medium
+nautilus-imgur-uploader (0.2.1-0extras16.04.0) xenial; urgency=medium
+
+  * Changed icon
+  * Looking for a bug
+
+ -- Lorenzo Carbonell <lorenzo.carbonell.cerezo@gmail.com>  Sun, 18 Dec 2016 20:08:23 +0100
+
+nautilus-imgur-uploader (0.2.0-0extras16.04.3) xenial; urgency=medium
 
   * Added Answer dialog to show links
   * Fixed some minor bugs
 
- -- Lorenzo Carbonell <lorenzo.carbonell.cerezo@gmail.com>  Sat, 10 Dec 2016 10:14:10 +0100
+ -- Lorenzo Carbonell <lorenzo.carbonell.cerezo@gmail.com>  Sat, 10 Dec 2016 18:30:41 +0100
 
 nautilus-imgur-uploader (0.1.0-0extras16.04.7) xenial; urgency=medium
 

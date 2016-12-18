@@ -153,8 +153,11 @@ class ImgurClient(object):
             raise ImgurClientRateLimitError()
 
         try:
+            print(response)
+            print(response.text)
             response_data = response.json()
-        except:
+        except Exception as e:
+            print(e)
             raise ImgurClientError('JSON decoding of response failed.')
 
         if 'data' in response_data and isinstance(response_data['data'], dict) and 'error' in response_data['data']:
@@ -594,7 +597,7 @@ class ImgurClient(object):
             'type': 'base64',
         }
         data.update({meta: config[meta] for meta in set(self.allowed_image_fields).intersection(config.keys())})
-        
+
         return self.make_request('POST', 'upload', data, anon)
 
     def upload_from_url(self, url, config=None, anon=True):

@@ -1,5 +1,6 @@
 import base64
 import requests
+import json
 from .imgur.models.tag import Tag
 from .imgur.models.album import Album
 from .imgur.models.image import Image
@@ -52,7 +53,8 @@ class AuthWrapper(object):
         if response.status_code != 200:
             raise ImgurClientError('Error refreshing access token!', response.status_code)
 
-        response_data = response.json()
+        # response_data = response.json()
+        response_data = json.loads(reponse.content)
         self.current_access_token = response_data['access_token']
 
 
@@ -153,9 +155,12 @@ class ImgurClient(object):
             raise ImgurClientRateLimitError()
 
         try:
+            print('****')
             print(response)
-            print(response.text)
-            response_data = response.json()
+            print(response.content)
+            print('****')
+            # response_data = response.json()
+            response_data = json.loads(reponse.content)
         except Exception as e:
             print(e)
             raise ImgurClientError('JSON decoding of response failed.')

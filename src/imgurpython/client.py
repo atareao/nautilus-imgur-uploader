@@ -51,10 +51,13 @@ class AuthWrapper(object):
         response = requests.post(url, data=data)
 
         if response.status_code != 200:
-            raise ImgurClientError('Error refreshing access token!', response.status_code)
-
+            raise ImgurClientError('Error refreshing access token!',
+                                   response.status_code)
         # response_data = response.json()
-        response_data = json.loads(reponse.content)
+        print('*** 2 ***')
+        print(response.content)
+        print('*** 2 ***')
+        response_data = json.loads(response.content)
         self.current_access_token = response_data['access_token']
 
 

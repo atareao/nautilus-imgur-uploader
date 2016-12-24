@@ -163,7 +163,7 @@ class ImgurClient(object):
             print(response.content)
             print('****')
             # response_data = response.json()
-            response_data = json.loads(reponse.content)
+            response_data = json.loads(response.content)
         except Exception as e:
             print(e)
             raise ImgurClientError('JSON decoding of response failed.')

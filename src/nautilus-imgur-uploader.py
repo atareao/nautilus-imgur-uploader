@@ -488,8 +488,8 @@ class ImgurUploaderMenuProvider(GObject.GObject, FileManager.MenuProvider):
         token_url = 'https://api.imgur.com/oauth2/token'
         response = session.request('POST', token_url, data=data)
         if response is not None and response.status_code == 200 and\
-                response.text is not None and len(response.text) > 0:
-            ans = json.loads(response.text)
+                response.content is not None and len(response.content) > 0:
+            ans = json.loads(response.content)
             self.access_token = ans['access_token']
             self.refresh_token = ans['refresh_token']
             token = Token()
@@ -578,8 +578,6 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 
 
 if __name__ == '__main__':
-
-    import requests
     token = Token()
     access_token = token.get('access_token')
     refresh_token = token.get('refresh_token')
@@ -596,8 +594,8 @@ if __name__ == '__main__':
         token_url = 'https://api.imgur.com/oauth2/token'
         response = session.request('POST', token_url, data=data)
         if response is not None and response.status_code == 200 and\
-                response.text is not None and len(response.text) > 0:
-            ans = json.loads(response.text)
+                response.content is not None and len(response.content) > 0:
+            ans = json.loads(response.content)
             access_token = ans['access_token']
             refresh_token = ans['refresh_token']
             token.set('access_token', access_token)

@@ -31,10 +31,6 @@ except Exception as e:
     print(e)
     exit(-1)
 import os
-import subprocess
-import shlex
-import tempfile
-import shutil
 from threading import Thread
 from urllib import unquote_plus
 from gi.repository import GObject
@@ -61,9 +57,7 @@ CLIENT_ID = '674fadc274d0beb'
 CLIENT_SECTRET = '4fd4cdcd942ca2427dbbf8f7ce6ab6ea71abb78e'
 EXTENSIONS_FROM = ['.bmp', '.eps', '.gif', '.jpg', '.pcx', '.png', '.ppm',
                    '.tif', '.tiff', '.webp']
-PARAMS = {
-        'access_token': '',
-        'refresh_token': ''}
+PARAMS = {'access_token': '', 'refresh_token': ''}
 _ = str
 
 
@@ -174,6 +168,7 @@ class DoItInBackground(IdleObject, Thread):
         'ended': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (
             bool, object,)),
         'start_one': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (str,)),
+        'error': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (str,)),
         'end_one': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (float,)),
     }
 
@@ -208,9 +203,14 @@ class DoItInBackground(IdleObject, Thread):
                     self.ok = False
                     break
                 self.emit('start_one', element)
+                self.emit('error', 'started')
                 ans = self.send_file(element)
                 self.emit('end_one', get_duration(element))
         except Exception as e:
+            print('*** dib error ***')
+            self.emit('error', 'Error: %s' % str(e))
+            print(e)
+            print('***/ dib error /***')
             self.ok = False
         self.emit('ended', self.ok, ans)
 
@@ -282,7 +282,7 @@ class Progreso(Gtk.Dialog, IdleObject):
 
     def increase(self, anobject, value):
         self.value += float(value)
-        fraction = self.value/self.max_value
+        fraction = self.value / self.max_value
         self.progressbar.set_fraction(fraction)
         if self.value >= self.max_value:
             self.hide()
@@ -320,15 +320,15 @@ class ImgurAnswerDialog(Gtk.Dialog):
         entries = []
         for index, label_text in enumerate(labels):
             label = Gtk.Label(label_text)
-            label.set_xalign(0)
+            label.set_alignment(0, 0.5)
             grid.attach(label, 0, index, 1, 1)
             entries.append(Gtk.Entry())
-            entries[len(entries)-1].set_width_chars(50)
-            grid.attach(entries[len(entries)-1], 1, index, 1, 1)
+            entries[len(entries) - 1].set_width_chars(50)
+            grid.attach(entries[len(entries) - 1], 1, index, 1, 1)
             button = Gtk.Button(_('Copy'))
             button.connect('clicked',
                            self.on_button_clicked,
-                           entries[len(entries)-1])
+                           entries[len(entries) - 1])
             grid.attach(button, 2, index, 1, 1)
 
         if ans is not None:
@@ -368,19 +368,19 @@ class ImgurDialog(Gtk.Dialog):
         grid.set_row_spacing(5)
         frame.add(grid)
         self.get_content_area().add(frame)
-        label = Gtk.Label(_('Name')+' :')
-        label.set_xalign(0)
+        label = Gtk.Label(_('Name') + ' :')
+        label.set_alignment(0, 0.5)
         grid.attach(label, 0, 0, 1, 1)
         self.name = Gtk.Entry()
         self.name.set_width_chars(50)
         grid.attach(self.name, 1, 0, 1, 1)
-        label = Gtk.Label(_('Title')+' :')
-        label.set_xalign(0)
+        label = Gtk.Label(_('Title') + ' :')
+        label.set_alignment(0, 0.5)
         grid.attach(label, 0, 1, 1, 1)
         self.title = Gtk.Entry()
         grid.attach(self.title, 1, 1, 1, 1)
-        label = Gtk.Label(_('Description')+' :')
-        label.set_xalign(0)
+        label = Gtk.Label(_('Description') + ' :')
+        label.set_alignment(0, 0.5)
         grid.attach(label, 0, 2, 1, 1)
         scrolledwindow = Gtk.ScrolledWindow()
         scrolledwindow.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
@@ -442,33 +442,51 @@ class ImgurUploaderMenuProvider(GObject.GObject, FileManager.MenuProvider):
             if len(files) == 1:
                 imd = ImgurDialog(window)
                 if imd.run() == Gtk.ResponseType.ACCEPT:
-                    config = {
-                            'album': None,
-                            'name': imd.get_name(),
-                            'title': imd.get_title(),
-                            'description': imd.get_description()}
+                    config = {'album': None,
+                              'name': imd.get_name(),
+                              'title': imd.get_title(),
+                              'description': imd.get_description()}
                     imd.destroy()
                 else:
                     imd.destroy()
                     return
             else:
                 config = None
+            print(0)
             self.client = ImgurClient(CLIENT_ID,
                                       CLIENT_SECTRET,
                                       self.access_token,
                                       self.refresh_token)
-
+            print(1)
             diib = DoItInBackground(files, self.client, config)
+            print(2)
             progreso = Progreso(_('Send files to Imgur'), window, len(files))
+            print(3)
             diib.connect('started', progreso.set_max_value)
+            print(4)
             diib.connect('start_one', progreso.set_element)
+            print(5)
             diib.connect('end_one', progreso.increase)
+            print(6)
             diib.connect('ended', progreso.close)
+            print(7)
             if len(files) == 1:
+                print(8)
                 diib.connect('ended', self.show_ans, window)
+            print(9)
+            diib.connect('error', self.print_error)
+            print(11)
             progreso.connect('i-want-stop', diib.stop)
+            print(12)
             diib.start()
+            print(13)
             progreso.run()
+            print(14)
+
+    def print_error(self, anobject, anerror):
+        print('error - start')
+        print(anerror)
+        print('error - end')
 
     def show_ans(self, anobject, result, ans, window):
         iad = ImgurAnswerDialog(window, ans)
@@ -604,11 +622,10 @@ if __name__ == '__main__':
     client = ImgurClient(CLIENT_ID, CLIENT_SECTRET, access_token,
                          refresh_token)
     print('client', client.auth)
-    config = {
-            'album': None,
-            'name':  'the name',
-            'title': 'the title',
-            'description': 'Cute kitten being cute on'}
+    config = {'album': None,
+              'name': 'the name',
+              'title': 'the title',
+              'description': 'Cute kitten being cute on'}
 
     with open(
             '/home/lorenzo/Escritorio/nautilus-twitter-uploader-reduced.png',

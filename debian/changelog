@@ -1,8 +1,8 @@
-nautilus-imgur-uploader (0.2.1-0extras16.04.5) xenial; urgency=medium
+nautilus-imgur-uploader (0.2.1-0extras16.04.12) xenial; urgency=medium
 
   * Changed response.json <-> json(response.content)
 
- -- Lorenzo Carbonell <lorenzo.carbonell.cerezo@gmail.com>  Sat, 24 Dec 2016 08:27:46 +0100
+ -- Lorenzo Carbonell <lorenzo.carbonell.cerezo@gmail.com>  Wed, 04 Jan 2017 09:16:51 +0100
 
 nautilus-imgur-uploader (0.2.1-0extras16.04.1) xenial; urgency=medium
 

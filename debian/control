@@ -9,11 +9,12 @@ Homepage: http://www.atareao.es
 Package: nautilus-imgur-uploader
 Architecture: all
 Depends: ${misc:Depends}, ${python:Depends},
-	python,
-	python-gi,
-	python-cairo,
-	gir1.2-nautilus-3.0,
-	python-nautilus,
-	python-requests
+    python,
+    python-gi,
+    python-cairo,
+    gir1.2-nautilus-3.0,
+    gir1.2-webkit-3.0,
+    python-nautilus,
+    python-requests
 Description: An extension for Nautilus to upload images to Imgur
  An extension for Nautilus to upload images to Imgur
